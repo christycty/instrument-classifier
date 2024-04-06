@@ -12,10 +12,10 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-model_dir = 'code/models/irmas_rf_5c'
+model_dir = 'code/models/irmas_rf_10c'
 
 def load_data():
-    df = pd.read_csv('data/irmas/IRMAS-Training-5Class.csv')
+    df = pd.read_csv('data/irmas/IRMAS-Training.csv')
     
     # get column names without class and filename
     feature_names = df.columns.tolist()
@@ -96,6 +96,12 @@ if __name__ == "__main__":
     plt.ylabel('Actual')
     plt.tight_layout()
     plt.savefig(os.path.join(model_dir, 'confusion_matrix.png'))
+    
+    # evaluate with some more metrics 
+    print(sklearn.metrics.classification_report(y_test, y_pred, target_names=le.classes_))
+    # save result to txt
+    with open(os.path.join(model_dir, 'classification_report.txt'), 'w') as f:
+        f.write(sklearn.metrics.classification_report(y_test, y_pred, target_names=le.classes_))
     
     # show some sample predictions (filename, predicted label, actual label)
     for i in range(5):
