@@ -145,7 +145,7 @@ class misdProcessor():
                     
         
 if __name__ == "__main__":
-    vgg_dir = 'data/irmas/vggish/training'
+    vgg_dir = 'data/MIS/vggish'
     csv_name = 'vggish-all.csv'
     
     # wav_dir = 'data/irmas/IRMAS-Sample/Training'
@@ -155,8 +155,8 @@ if __name__ == "__main__":
     processor = misdProcessor(wav_dir, meta_file)
     
     # processor.list_files()
-    # processor.merge_vgg(vgg_dir, csv_name)
-    
+    processor.merge_vgg(vgg_dir, csv_name)
+    exit()
     
     # spectro_dir = 'data/irmas/spectrogram/training_veridis'
     # spectro_dir = 'data/irmas/spectrogram/sample'

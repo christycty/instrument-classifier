@@ -1,0 +1,10 @@
+              precision    recall  f1-score   support
+
+        drum       0.97      0.98      0.97       146
+      guitar       0.97      1.00      0.99       142
+       piano       0.98      0.93      0.95        99
+      violin       1.00      0.99      1.00       138
+
+    accuracy                           0.98       525
+   macro avg       0.98      0.98      0.98       525
+weighted avg       0.98      0.98      0.98       525

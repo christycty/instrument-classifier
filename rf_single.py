@@ -12,11 +12,11 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-model_dir = 'code/models/misd_rf'
+model_dir = 'code/models/misd_rf_comb'
 
 def merge_two_data():
-    df1 = pd.read_csv('data/irmas/vggish/training/vggish-all.csv')
-    df2 = pd.read_csv('data/irmas/IRMAS-Training.csv')
+    df1 = pd.read_csv('data/MIS/vggish/vggish-all.csv')
+    df2 = pd.read_csv('data/MIS/librosa-feature.csv')
     
     # join two dataframes on filename
     df1 = df1.set_index('filename')
@@ -28,11 +28,12 @@ def merge_two_data():
     df2 = df2.set_index('filename')
     df = df1.join(df2, how='inner', lsuffix='_1', rsuffix='_2')
     
-    df.to_csv('data/irmas/combined-librosa-vggish.csv')
+    df.to_csv('data/MIS/combined-librosa-vggish.csv')
 
 def load_data():
-    df = pd.read_csv('data/MIS/librosa-feature.csv')
-    
+    # df = pd.read_csv('data/MIS/vggish/vggish-all.csv')
+    df = pd.read_csv('data/MIS/combined-librosa-vggish.csv')
+
     # get column names without class and filename
     feature_names = df.columns.tolist()
     feature_names.remove('class')
@@ -100,12 +101,16 @@ if __name__ == "__main__":
     X_train = X_train.drop(columns=['filename'])
     X_test = X_test.drop(columns=['filename'])
     rf = train_rf(X_train, X_test, y_train, y_test)
+    
+    os.makedirs(model_dir, exist_ok=True)
+    
     show_feature_importance(rf, feature_names)
     
     store_model(rf)
     
     # plot a confusion matrix on testing data
     y_pred = rf.predict(X_test)
+    
     cm = confusion_matrix(y_test, y_pred)
     
     # plot confusion matrix using seaborn, showing class label names instead of numbers
