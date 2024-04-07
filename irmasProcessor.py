@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from utils import extract_features
 
+
+# all the processing for the IRMAS dataset
 class irmasProcessor():
     def __init__(self, wav_dir) -> None:
         self.wav_dir = wav_dir
@@ -31,6 +33,7 @@ class irmasProcessor():
         
         return pd.DataFrame(data)
 
+    # generate spectrogram for each audio
     def gen_spectrogram(self, save_dir):
         
         classes = os.listdir(self.wav_dir)
@@ -48,30 +51,64 @@ class irmasProcessor():
             class_dir = os.path.join(self.wav_dir, class_)
             
             for wav_file in os.listdir(class_dir):
-                print(f"processing file {i}:", wav_file)
-                i += 1
+                # print(f"processing file {i}:", wav_file)
+                # i += 1
+                # if i <= 3482:
+                #     continue
                 
                 wav_path = os.path.join(class_dir, wav_file)
                 y, sr = librosa.load(wav_path)
                 S = librosa.feature.melspectrogram(y=y, sr=sr)
                 S_dB = librosa.power_to_db(S, ref=np.max)
-                img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr)
+                img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr, cmap='viridis')
                 # remove border 
                 plt.axis('off')
                 plt.tight_layout(pad=0)
                 # save img to path
                 img_path = os.path.join(save_dir, class_, wav_file[:-4] + '.png')
                 plt.savefig(img_path)
-        
+                plt.clf()
     
+    # rename the generated spectrogram for upload to kaggle
+    def spectro_rename(self, dir):
+        classes = os.listdir(dir)
+        for class_ in classes:
+            for filepath in os.listdir(os.path.join(dir, class_)):
+                # change all [] to _ in filename
+                new_filepath = filepath.replace('[', '_').replace(']', '_')
+                os.rename(os.path.join(dir, class_, filepath), os.path.join(dir, class_, new_filepath))
+    
+    # merge the vggish features into one csv file
+    def merge_vgg(self, vgg_dir, csv_name):
+        files = os.listdir(vgg_dir)
+        
+        for i, file in enumerate(files):
+            if i == 0:
+                df = pd.read_csv(os.path.join(vgg_dir, file))
+            else:
+                df = pd.concat([df, pd.read_csv(os.path.join(vgg_dir, file))])
+        
+        csv_path = os.path.join(vgg_dir, csv_name)
+        df.to_csv(csv_path, index=False)
+        
+        
 if __name__ == "__main__":
+    vgg_dir = 'data/irmas/vggish/training'
+    csv_name = 'vggish-all.csv'
+    
     # wav_dir = 'data/irmas/IRMAS-Sample/Training'
     wav_dir = 'data/irmas/IRMAS-TrainingData'
     processor = irmasProcessor(wav_dir)
+    # processor.merge_vgg(vgg_dir, csv_name)
     
-    # save_dir = 'data/irmas/spectrogram/sample'
-    save_dir = 'data/irmas/spectrogram/training'
-    processor.gen_spectrogram(save_dir)
+    
+    spectro_dir = 'data/irmas/spectrogram/training_veridis'
+    # spectro_dir = 'data/irmas/spectrogram/sample'
+    # spectro_dir = 'data/irmas/spectrogram/training'
+    
+    processor.gen_spectrogram(spectro_dir)
+    
+    processor.spectro_rename(spectro_dir)
     
     # df = processor.gen_librosa_features()
 

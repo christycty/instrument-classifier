@@ -1,7 +1,10 @@
 import librosa
 
-def extract_features(audio_path):
-    y, sr = librosa.load(audio_path)  
+def extract_features(audio_path, duration=None):
+    if duration:
+        y, sr = librosa.load(audio_path, duration=duration)
+    else:
+        y, sr = librosa.load(audio_path)  
     
     features = {}
     

@@ -17,18 +17,20 @@ class featureExtractor():
         pass
     
     def load_wav(self, wav_file):
-        '''samples_all = []
-        for wav_file in wav_files:
-            wav_data, sr = sf.read(wav_file, dtype='int16')
+        wav_data, sr = sf.read(wav_file, dtype='int16')
+        assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
     
-            samples = wav_data / 32768.0  # Convert to [-1.0, +1.0]
-            samples_all.append(samples)
+        samples = wav_data / 32768.0  # Convert to [-1.0, +1.0]
         
-        samples_all = np.stack(samples_all)
-        self.examples_batch = vggish_input.waveform_to_examples(samples_all, sr)        
-        '''
+        # print(samples.shape, sr)
+        # crop the first 3 seconds
+        if len(samples) > sr*3:
+            samples = samples[:sr*3]
+            
+        self.examples_batch = vggish_input.waveform_to_examples(samples, sr)        
         
-        self.examples_batch = vggish_input.wavfile_to_examples(wav_file)
+        
+        # self.examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
     
     def extract_features(self):
@@ -50,6 +52,7 @@ class featureExtractor():
                                         feed_dict={features_tensor: self.examples_batch})
             postprocessed_batch = pproc.postprocess(embedding_batch)
             self.postprocessed_batch = postprocessed_batch
+            # print(postprocessed_batch)
             
         return postprocessed_batch
     
@@ -64,25 +67,33 @@ class featureExtractor():
 
 if __name__ == '__main__':
     # data_dir = 'data/irmas/IRMAS-Sample/Training'
-    data_dir = 'data/irmas/IRMAS-TrainingData'
+    # data_dir = 'data/irmas/IRMAS-TrainingData'
+    data_dir = 'data/MIS/raw/training'
+    
+    meta_file = 'data/MIS/raw/training.csv'
     
     # csv_dir = 'data/irmas/vggish/sample'
-    csv_dir = 'data/irmas/vggish/training'
+    # csv_dir = 'data/irmas/vggish/training'
+    csv_dir = 'data/MIS'
     
 #   tf.app.run()
     feature_extractor = featureExtractor()
 
-    classes = os.listdir(data_dir)
-    drop_classes = ['gel', 'cel', 'flu', 'org', 'sax', 'tru']
+    df = pd.read_csv(meta_file)
+    classes = df['class'].unique()
+    
+    # drop_classes = ['gel', 'cel', 'flu', 'org', 'sax', 'tru']
+    drop_classes = ['piano']
     
     for class_ in classes:
-        if class_ == 'gel':
+        if class_ in drop_classes:
             continue
+        df_class = df[df['class'] == class_]
         
         print("processing class:", class_)
-        class_dir = os.path.join(data_dir, class_)
-        file_list = os.listdir(class_dir)
-        file_list = [os.path.join(class_dir, file) for file in file_list]
+        
+        file_list = df_class['filename'].tolist()
+        file_list = [os.path.join(data_dir, file) for file in file_list]
         
         features = []
         postprocessed_batch = feature_extractor.run(file_list)
@@ -98,9 +109,9 @@ if __name__ == '__main__':
             
             features.append(feature)
           
-        df = pd.DataFrame(features)
+        df_feature = pd.DataFrame(features)
         csv_path = os.path.join(csv_dir, f'vggish-{class_}.csv')
-        df.to_csv(csv_path, index=False)
+        df_feature.to_csv(csv_path, index=False)
     
             
             
