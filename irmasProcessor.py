@@ -90,18 +90,29 @@ class irmasProcessor():
         
         csv_path = os.path.join(vgg_dir, csv_name)
         df.to_csv(csv_path, index=False)
+    
+    def filter_csv(self, csv_old_path, csv_new_path, classes):
+        df = pd.read_csv(csv_old_path)
+        df = df[df['class'].isin(classes)]
+        df.to_csv(csv_new_path, index=False)
+        return df
         
         
 if __name__ == "__main__":
     vgg_dir = 'data/irmas/vggish/training'
-    csv_name = 'vggish-all.csv'
+    # csv_name = 'data/irmas/IRMAS-Training.csv'
+    # csv_new_name = 'data/irmas/IRMAS-Training-5Class.csv'
+    
+    csv_name = 'data/irmas/combined-librosa-vggish.csv'
+    csv_new_name = 'data/irmas/combined-librosa-vggish-5class.csv'
     
     # wav_dir = 'data/irmas/IRMAS-Sample/Training'
     wav_dir = 'data/irmas/IRMAS-TrainingData'
     processor = irmasProcessor(wav_dir)
     # processor.merge_vgg(vgg_dir, csv_name)
     
-    
+    processor.filter_csv(csv_name, csv_new_name, ['cla', 'gac', 'pia', 'tru', 'voi'])
+    exit()
     spectro_dir = 'data/irmas/spectrogram/training_veridis'
     # spectro_dir = 'data/irmas/spectrogram/sample'
     # spectro_dir = 'data/irmas/spectrogram/training'

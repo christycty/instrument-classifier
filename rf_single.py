@@ -12,10 +12,10 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-model_dir = 'code/models/misd_rf_comb'
+model_dir = 'code/models/irmas_rf_comb_5c'
 
 def merge_two_data():
-    df1 = pd.read_csv('data/MIS/vggish/vggish-all.csv')
+    df1 = pd.read_csv('data/irmas/vggish/vggish-all.csv')
     df2 = pd.read_csv('data/MIS/librosa-feature.csv')
     
     # join two dataframes on filename
@@ -32,7 +32,7 @@ def merge_two_data():
 
 def load_data():
     # df = pd.read_csv('data/MIS/vggish/vggish-all.csv')
-    df = pd.read_csv('data/MIS/combined-librosa-vggish.csv')
+    df = pd.read_csv('data/irmas/combined-librosa-vggish-5class.csv')
 
     # get column names without class and filename
     feature_names = df.columns.tolist()

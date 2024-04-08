@@ -12,7 +12,7 @@ from sklearn.preprocessing import LabelEncoder
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from utils import extract_features 
 
 dir = {
     'MIS_comb': {
@@ -33,6 +33,7 @@ dir = {
 
 }
 
+# MIS_comb, MIS_vgg, IRMAS
 model_mode = 'MIS_comb'
 model_dir = dir[model_mode]['model_dir']
 
@@ -41,7 +42,7 @@ demo_files = [
     ['ROOM_room1_MUS_bartok_DEV_redmi.wav', 'MIS_comb'],
     ['[vio][cla]2135__1.wav', 'IRMAS'],
     ['[pia][jaz_blu]1513__1.wav', 'IRMAS'],
-    ['[voi][jaz_blu]2482__2.wav', 'IRMAS']
+    ['[voi][jaz_blu]2482__2.wav', 'IRMAS'],
 ]
 demo_file = demo_files[demo_id]
 
@@ -53,6 +54,13 @@ def load_features(csv_path):
     features = row.drop(columns=['class', 'filename'])
     return features
 
+def compute_features():
+    song_dir = 'code/demo_files'
+    song_path = os.path.join(song_dir, demo_file[0])
+    features = extract_features(song_path)
+    print(features)
+    return features
+
 def run():
     print(f"Running inference for {demo_file[0]}...")
     print(f"Model mode: {model_mode}")
@@ -60,7 +68,10 @@ def run():
     rf = joblib.load(os.path.join(model_dir, 'rf.joblib')) 
     print(f"Loaded model from {model_dir}")
     
-    features = load_features(dir[demo_file[1]]['csv_path'])
+    if demo_file[1] == 'others':
+        features = compute_features()
+    else:
+        features = load_features(dir[demo_file[1]] ['csv_path'])
     print(f"Loaded features for {demo_file[0]}")
     
     pred = rf.predict(features)

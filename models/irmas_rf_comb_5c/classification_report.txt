@@ -1,0 +1,11 @@
+              precision    recall  f1-score   support
+
+         cla       0.85      0.80      0.82       123
+         gac       0.94      0.86      0.90       135
+         pia       0.83      0.91      0.87       116
+         tru       0.82      0.81      0.82       118
+         voi       0.92      0.97      0.95       152
+
+    accuracy                           0.88       644
+   macro avg       0.87      0.87      0.87       644
+weighted avg       0.88      0.88      0.88       644
